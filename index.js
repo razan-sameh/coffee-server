@@ -10,7 +10,13 @@ admin.initializeApp({
 });
 
 const app = express();
-
+app.options("*", (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "https://coffeeapp-45d44.web.app");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.sendStatus(200);
+});
 const corsOptions = {
     origin: "https://coffeeapp-45d44.web.app",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
