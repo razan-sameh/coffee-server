@@ -11,12 +11,18 @@ admin.initializeApp({
 
 const app = express();
 
-app.use(cors({
+const corsOptions = {
     origin: "https://coffeeapp-45d44.web.app",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-}));
+    credentials: true,
+};
 
+// Handle preflight requests first
+app.options("*", cors(corsOptions));
+
+// Then apply cors for all routes
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 
