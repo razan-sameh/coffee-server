@@ -11,12 +11,10 @@ admin.initializeApp({
 
 const app = express();
 
-const cors = require("cors");
-
 app.use(cors({
-  origin: "https://coffeeapp-45d44.web.app",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+    origin: "https://coffeeapp-45d44.web.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 // Handle preflight OPTIONS requests
