@@ -11,10 +11,16 @@ admin.initializeApp({
 
 const app = express();
 
-// ✅ Allow requests from frontend (React app)
+const cors = require("cors");
+
 app.use(cors({
-    origin: "https://coffeeapp-45d44.web.app", // or "*" to allow all origins (not recommended in production)
+  origin: "https://coffeeapp-45d44.web.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
+// Handle preflight OPTIONS requests
+app.options("*", cors());
 
 app.use(bodyParser.json());
 
