@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const admin = require("firebase-admin");
 const cors = require("cors");
 const fetch = require("node-fetch");
+const serverless = require("serverless-http");
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -273,5 +274,7 @@ app.post("/api/simulate-order/:uid/:orderId", async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+// const PORT = process.env.PORT || 3001;
+// app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+module.exports = app;
+module.exports.handler = serverless(app);
