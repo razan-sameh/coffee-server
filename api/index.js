@@ -190,89 +190,89 @@ const sendNotification = async (uid, status, orderId) => {
     await admin.messaging().send(message);
 };
 
-// // 🚀 Main simulation route
-// app.post("/api/simulate-order/:uid/:orderId", async (req, res) => {
-//     const { uid, orderId } = req.params;
+// 🚀 Main simulation route
+app.post("/api/simulate-order/:uid/:orderId", async (req, res) => {
+    const { uid, orderId } = req.params;
 
-//     try {
-//         // ✅ Pick a random driver
-//         const driver = await getRandomDriver();
-//         // ✅ Assign driver ID to order
-//         await admin.database().ref(`order/${orderId}/driver`).set(driver.uid);
+    try {
+        // ✅ Pick a random driver
+        const driver = await getRandomDriver();
+        // ✅ Assign driver ID to order
+        await admin.database().ref(`order/${orderId}/driver`).set(driver.uid);
 
-//         // Get delivery destination
-//         const orderSnap = await admin.database().ref(`order/${orderId}/deliveryInfo/address`).once("value");
-//         const addressData = orderSnap.val() || {};
-//         const destination = {
-//             latitude: addressData.latitude ?? 31.2001,
-//             longitude: addressData.longitude ?? 29.9187,
-//         };
+        // Get delivery destination
+        const orderSnap = await admin.database().ref(`order/${orderId}/deliveryInfo/address`).once("value");
+        const addressData = orderSnap.val() || {};
+        const destination = {
+            latitude: addressData.latitude ?? 31.2001,
+            longitude: addressData.longitude ?? 29.9187,
+        };
 
-//         // Starting point
-//         const driverLocation = {
-//             latitude: 31.233804468506055,
-//             longitude: 29.949878491206622,
-//         };
+        // Starting point
+        const driverLocation = {
+            latitude: 31.233804468506055,
+            longitude: 29.949878491206622,
+        };
 
-//         await admin.database().ref(`order/${orderId}/driverLocation`).set(driverLocation);
+        await admin.database().ref(`order/${orderId}/driverLocation`).set(driverLocation);
 
-//         // ✅ Get route + duration
-//         const { points: route, duration } = await fetchRoute(driverLocation, destination);
-//         if (route.length === 0) {
-//             throw new Error("No route found");
-//         }
+        // ✅ Get route + duration
+        const { points: route, duration } = await fetchRoute(driverLocation, destination);
+        if (route.length === 0) {
+            throw new Error("No route found");
+        }
 
-//         // ✅ حساب الوقت المتوقع للوصول ETA
-//         const now = new Date();
-//         const arrivalTime = new Date(now.getTime() + duration * 1000); // duration بالثواني
-//         const hh = arrivalTime.getHours().toString().padStart(2, "0");
-//         const mm = arrivalTime.getMinutes().toString().padStart(2, "0");
-//         const etaFormatted = `${hh}:${mm}`;
+        // ✅ حساب الوقت المتوقع للوصول ETA
+        const now = new Date();
+        const arrivalTime = new Date(now.getTime() + duration * 1000); // duration بالثواني
+        const hh = arrivalTime.getHours().toString().padStart(2, "0");
+        const mm = arrivalTime.getMinutes().toString().padStart(2, "0");
+        const etaFormatted = `${hh}:${mm}`;
 
-//         // ✅ Store ETA in Firebase
-//         await admin.database().ref(`order/${orderId}/estimatedTime`).set(etaFormatted);
+        // ✅ Store ETA in Firebase
+        await admin.database().ref(`order/${orderId}/estimatedTime`).set(etaFormatted);
 
-//         // Simulation timing
-//         const stepIntervalMs = 5000;
-//         let step = 0;
+        // Simulation timing
+        const stepIntervalMs = 5000;
+        let step = 0;
 
-//         if (activeSimulations[orderId]) {
-//             clearInterval(activeSimulations[orderId]);
-//         }
+        if (activeSimulations[orderId]) {
+            clearInterval(activeSimulations[orderId]);
+        }
 
-//         activeSimulations[orderId] = setInterval(async () => {
-//             if (step >= route.length) {
-//                 clearInterval(activeSimulations[orderId]);
-//                 delete activeSimulations[orderId];
+        activeSimulations[orderId] = setInterval(async () => {
+            if (step >= route.length) {
+                clearInterval(activeSimulations[orderId]);
+                delete activeSimulations[orderId];
 
-//                 await admin.database().ref(`order/${orderId}/driverLocation`).set(destination);
-//                 await sendNotification(uid, enmOrderStatus.Delivered, orderId);
-//                 return;
-//             }
+                await admin.database().ref(`order/${orderId}/driverLocation`).set(destination);
+                await sendNotification(uid, enmOrderStatus.Delivered, orderId);
+                return;
+            }
 
-//             const currentPoint = route[step];
-//             await admin.database().ref(`order/${orderId}/driverLocation`).set(currentPoint);
+            const currentPoint = route[step];
+            await admin.database().ref(`order/${orderId}/driverLocation`).set(currentPoint);
 
-//             step++;
-//         }, stepIntervalMs);
+            step++;
+        }, stepIntervalMs);
 
-//         // Send status notifications
-//         setTimeout(() => sendNotification(uid, enmOrderStatus.Brewing, orderId), 1000);
-//         setTimeout(() => sendNotification(uid, enmOrderStatus.Ready, orderId), 3000);
-//         setTimeout(() => sendNotification(uid, enmOrderStatus.OutForDelivery, orderId), 5000);
+        // Send status notifications
+        setTimeout(() => sendNotification(uid, enmOrderStatus.Brewing, orderId), 1000);
+        setTimeout(() => sendNotification(uid, enmOrderStatus.Ready, orderId), 3000);
+        setTimeout(() => sendNotification(uid, enmOrderStatus.OutForDelivery, orderId), 5000);
 
-//         // ✅ رجع ETA في الريسبونس
-//         res.json({
-//             success: true,
-//             message: "Driver simulation started",
-//             steps: route.length,
-//             estimatedArrival: etaFormatted
-//         });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ error: err.message });
-//     }
-// });
+        // ✅ رجع ETA في الريسبونس
+        res.json({
+            success: true,
+            message: "Driver simulation started",
+            steps: route.length,
+            estimatedArrival: etaFormatted
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // const PORT = process.env.PORT || 3001;
 // app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
