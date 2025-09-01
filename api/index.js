@@ -7,6 +7,28 @@ const serverless = require("serverless-http");
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: process.env.FIREBASE_DATABASE_URL,
+});
+
+const app = express();
+app.options("*", (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "https://coffeeapp-45d44.web.app");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.sendStatus(200);
+});
+
+const corsOptions = {
+    origin: "https://coffeeapp-45d44.web.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+};
+
 // ✅ Keep track of active simulations (so multiple orders can run independently)
 const activeSimulations = {};
 const enmRole = {
@@ -45,28 +67,6 @@ const statusMessages = {
         body: `Order #${id} has been delivered.`,
     }),
 };
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-});
-
-const app = express();
-app.options("*", (req, res) => {
-    res.setHeader("Access-Control-Allow-Origin", "https://coffeeapp-45d44.web.app");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.sendStatus(200);
-});
-const corsOptions = {
-    origin: "https://coffeeapp-45d44.web.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-};
-
-// Handle preflight requests first
-// app.options("*", cors(corsOptions));
 
 // Then apply cors for all routes
 app.use(cors(corsOptions));
