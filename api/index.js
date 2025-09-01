@@ -2,7 +2,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const admin = require("firebase-admin");
 const cors = require("cors");
-const fetch = require("node-fetch");
 const serverless = require("serverless-http");
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -150,7 +149,7 @@ const fetchRoute = async (start, destination) => {
                 latitude: c[1],
                 longitude: c[0],
             })),
-            duration: data.routes[0].duration // ✅ مدة الرحلة بالثواني
+            duration: data.routes[0].duration
         };
     }
     return { points: [], duration: 0 };
