@@ -73,7 +73,7 @@ app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 
-app.delete("/api/delete-user", async (req, res) => {
+app.post("/api/delete-user", async (req, res) => {
     const { uid } = req.body;
     if (!uid) return res.status(400).json({ error: "Missing UID" });
 
