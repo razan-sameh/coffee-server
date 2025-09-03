@@ -8,10 +8,13 @@ const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: process.env.FIREBASE_DATABASE_URL,
-});
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: process.env.FIREBASE_DATABASE_URL,
+    });
+}
+
 
 const app = express();
 app.options("*", (req, res) => {
@@ -73,7 +76,7 @@ app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 
-app.post("/api/delete-user", async (req, res) => {
+app.delete("/api/delete-user", async (req, res) => {
     const { uid } = req.body;
     if (!uid) return res.status(400).json({ error: "Missing UID" });
 
